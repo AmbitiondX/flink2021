@@ -1,4 +1,4 @@
-package com.atguigu.day04.project;
+package com.atguigu.day04.project.bean;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

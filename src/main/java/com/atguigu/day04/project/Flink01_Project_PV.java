@@ -1,13 +1,12 @@
 package com.atguigu.day04.project;
 
-import org.apache.flink.api.common.functions.FlatMapFunction;
+import com.atguigu.day04.project.bean.UserBehavior;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.streaming.api.datastream.DataStreamSource;
 import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.api.functions.ProcessFunction;
 import org.apache.flink.util.Collector;
-import scala.Int;
 
 public class Flink01_Project_PV {
     public static void main(String[] args) throws Exception {

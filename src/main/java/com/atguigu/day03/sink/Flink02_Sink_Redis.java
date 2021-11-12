@@ -63,7 +63,7 @@ public class Flink02_Sink_Redis {
 
         // todo 将数据写到redis（set）
         FlinkJedisPoolConfig poolConfig = new FlinkJedisPoolConfig.Builder().setHost("hadoop102").build();
-        map.addSink(new RedisSink<>(poolConfig, new RedisMapper<String>() {
+        map.addSink(new RedisSink<String>(poolConfig, new RedisMapper<String>() {
             @Override
             public RedisCommandDescription getCommandDescription() {
                 return new RedisCommandDescription(RedisCommand.SADD);

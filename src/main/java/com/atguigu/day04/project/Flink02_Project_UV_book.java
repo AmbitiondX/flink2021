@@ -1,5 +1,6 @@
 package com.atguigu.day04.project;
 
+import com.atguigu.day04.project.bean.UserBehavior;
 import org.apache.flink.api.common.typeinfo.Types;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
