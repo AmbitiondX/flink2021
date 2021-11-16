@@ -1,4 +1,4 @@
-package com.atguigu.flinktable;
+package com.atguigu.flinksql_table.flinktable;
 
 import com.atguigu.day02.source.WaterSensor;
 import org.apache.flink.api.java.tuple.Tuple2;

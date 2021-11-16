@@ -1,8 +1,6 @@
-package com.atguigu.flinktable;
+package com.atguigu.flinksql_table.flinktable;
 
 import com.atguigu.day02.source.WaterSensor;
-import org.apache.flink.api.java.tuple.Tuple2;
-import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.datastream.DataStreamSource;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.table.api.DataTypes;
@@ -11,11 +9,10 @@ import org.apache.flink.table.api.bridge.java.StreamTableEnvironment;
 import org.apache.flink.table.descriptors.Csv;
 import org.apache.flink.table.descriptors.FileSystem;
 import org.apache.flink.table.descriptors.Schema;
-import org.apache.flink.types.Row;
 
 import static org.apache.flink.table.api.Expressions.$;
 
-public class Flink03_TableApi_FileSink {
+public class Flink05_TableApi_FileSink {
     public static void main(String[] args) throws Exception {
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         env.setParallelism(1);
@@ -42,9 +39,15 @@ public class Flink03_TableApi_FileSink {
                 .field("vc", DataTypes.INT());
 
         tableEnv
-                .connect(new FileSystem().path("output/"))
+                .connect(new FileSystem().path("output/sensor_id.txt"))
+                .withFormat(new Csv().fieldDelimiter('|'))
+                .withSchema(schema)
+                .createTemporaryTable("sensor");
 
+        // 把数据写入到输出表中
+        resuleTable.executeInsert("sensor");
 
-        env.execute();
+//        env.execute()方法会去分析代码，生成一些 graph，但是我们代码中没有调用算子，所以会报错，可以直接不用
+//        env.execute();
     }
 }

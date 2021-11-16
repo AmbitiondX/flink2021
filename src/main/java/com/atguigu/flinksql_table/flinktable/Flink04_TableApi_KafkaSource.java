@@ -1,21 +1,20 @@
-package com.atguigu.flinktable;
+package com.atguigu.flinksql_table.flinktable;
 
-import com.atguigu.day02.source.WaterSensor;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.streaming.api.datastream.DataStream;
-import org.apache.flink.streaming.api.datastream.DataStreamSource;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.table.api.DataTypes;
 import org.apache.flink.table.api.Table;
 import org.apache.flink.table.api.bridge.java.StreamTableEnvironment;
-import org.apache.flink.table.descriptors.Csv;
-import org.apache.flink.table.descriptors.FileSystem;
-import org.apache.flink.table.descriptors.Schema;
+import org.apache.flink.table.descriptors.*;
 import org.apache.flink.types.Row;
+import org.apache.kafka.clients.consumer.ConsumerConfig;
+
+import java.util.Properties;
 
 import static org.apache.flink.table.api.Expressions.$;
 
-public class Flink03_TableApi_FileSource {
+public class Flink04_TableApi_KafkaSource {
     public static void main(String[] args) throws Exception {
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         env.setParallelism(1);
@@ -31,8 +30,14 @@ public class Flink03_TableApi_FileSource {
                 .field("vc", DataTypes.INT());
 
         // 2.2 连接文件, 并创建一个临时表, 其实就是一个动态表
-        tableEnv.connect(new FileSystem().path("input/sensor.txt"))
-                .withFormat(new Csv().fieldDelimiter(',').lineDelimiter("\n"))
+        Properties properties = new Properties();
+        properties.put(ConsumerConfig.GROUP_ID_CONFIG, "hadoop102:9092");
+        properties.put(ConsumerConfig.GROUP_ID_CONFIG, "flinkTalbe");
+        tableEnv.connect(new Kafka()
+                        .properties(properties)
+                        .topic("sensor")
+                        .startFromLatest())
+                .withFormat(new Json())
                 .withSchema(schema)
                 .createTemporaryTable("sensor");
 

@@ -1,16 +1,16 @@
-package com.atguigu.flinktable;
+package com.atguigu.flinksql_table.flinktable;
 
 import com.atguigu.day02.source.WaterSensor;
-import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.datastream.DataStreamSource;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
+import org.apache.flink.table.api.DataTypes;
 import org.apache.flink.table.api.Table;
 import org.apache.flink.table.api.bridge.java.StreamTableEnvironment;
-import org.apache.flink.types.Row;
+import org.apache.flink.table.descriptors.*;
 
 import static org.apache.flink.table.api.Expressions.$;
 
-public class Flink01_TableApi_BasicUse {
+public class Flink06_TableApi_KafkaSink {
     public static void main(String[] args) throws Exception {
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         env.setParallelism(1);
@@ -25,19 +25,32 @@ public class Flink01_TableApi_BasicUse {
         // 1. 创建表的执行环境
         StreamTableEnvironment tableEnv = StreamTableEnvironment.create(env);
 
-        // 2. 创建表：将流转换成表，表的字段名从pojo的属性名自动抽取
-        Table table = tableEnv.fromDataStream(waterSensorStream);
-
-        // 3. 对动态表进行查询
-        Table resultTable = table
+        Table sensorTable = tableEnv.fromDataStream(waterSensorStream);
+        Table resuleTable = sensorTable
                 .where($("id").isEqual("sensor_1"))
                 .select($("id"), $("ts"), $("vc"));
 
-        // 4. 把动态表转换成流
-        DataStream<Row> rowDataStream = tableEnv.toAppendStream(resultTable, Row.class);
+        // 创建输出表
+        Schema schema = new Schema()
+                .field("id", DataTypes.STRING())
+                .field("ts", DataTypes.BIGINT())
+                .field("vc", DataTypes.INT());
 
-        rowDataStream.print();
+        tableEnv
+                .connect(
+                        new Kafka()
+                                .version("universal")
+                                .topic("sensor")
+                                .sinkPartitionerRoundRobin()
+                                .property("bootstrap.servers","hadoop102:9092"))
+                .withFormat(new Json())
+                .withSchema(schema)
+                .createTemporaryTable("sensor");
 
-        env.execute();
+        // 把数据写入到输出表中
+        resuleTable.executeInsert("sensor");
+
+//        env.execute()方法会去分析代码，生成一些 graph，但是我们代码中没有调用算子，所以会报错，可以直接不用
+//        env.execute();
     }
 }
