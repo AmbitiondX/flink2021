@@ -22,9 +22,9 @@ public class Flink01_SQL_GroupWindow_Tumbling {
                 "    'format' = 'csv'" +
                 ")");
 
-        // todo 开启一个基于时间时间的滚动窗口
+        // todo 开启一个基于事件时间的滚动窗口
         // todo 当读取有界数据时，使用处理时间(文件太小，读取速度太快)，导窗口无法关闭，所以没有数据输出
-        // 处理时间读取有界流，按照时间开窗没有意义，因为读取速度太快，把握不好矿窗口大小，而且还可能丢数据
+        // 处理时间读取有界流，按照时间开窗没有意义，因为读取速度太快，把握不好窗口大小，而且还可能丢数据
         tableEnv.executeSql(
                 "select id,\n" +
                         "TUMBLE_START(t, interval '3' second),\n" +
@@ -33,5 +33,12 @@ public class Flink01_SQL_GroupWindow_Tumbling {
                         "from sensor \n " +
                         "group by TUMBLE(t, interval '3' second), id"
         ).print();
+
+        tableEnv.executeSql("select now()").print();
+        // 精确到秒
+        tableEnv.executeSql("select unix_timestamp()").print();
+        // date_format() 在flink1.12中有bug
+        tableEnv.executeSql("select date_format(now(),'yyyy-MM-dd HH:mm:ss.SSS')").print();
+
     }
 }
