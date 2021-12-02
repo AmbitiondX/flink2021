@@ -42,7 +42,7 @@ public class Flink16_GroupWindow_Tumble_Count {
 
         /*
             开启一个基于处理时间的翻滚行计数窗口
-            1.不能使用时间时间，必须使用过处理时间
+            1.不能使用事件时间，必须使用过处理时间
             2.当所有条数达不到rowInterval的值时，不会关闭窗口，所以该窗口就不产出结果
          */
         waterSensorTable
